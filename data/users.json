@@ -1,0 +1,231 @@
+{
+  "serviceName": "PIC Users Directory",
+  "urlPrefix": "/users",
+  "endpoint": {
+    "method": "GET",
+    "path": "/users",
+    "title": "/users Directory Endpoint",
+    "summary": "Returns PIC roster data with site assignment, roles, staffing signals, and audit metadata.",
+    "version": "1.2",
+    "auth": "PIC OAuth (service token)",
+    "cache": "60s"
+  },
+  "environments": [
+    {
+      "key": "PROD",
+      "label": "Production",
+      "description": "Live environment powering Takeda manufacturing + quality workflows.",
+      "baseUrl": "https://api.pic.takeda.com"
+    },
+    {
+      "key": "PERF",
+      "label": "Performance",
+      "description": "Scale-test cluster used for load and chaos experiments.",
+      "baseUrl": "https://perf.api.pic.takeda.com"
+    },
+    {
+      "key": "BREAKFIX",
+      "label": "Breakfix",
+      "description": "Hotfix lane for urgent production patches under validation.",
+      "baseUrl": "https://breakfix.api.pic.takeda.com"
+    },
+    {
+      "key": "UAT",
+      "label": "User Acceptance Testing",
+      "description": "Pre-prod tenant for business validation of upcoming releases.",
+      "baseUrl": "https://uat.api.pic.takeda.com"
+    },
+    {
+      "key": "SIT",
+      "label": "System Integration Testing",
+      "description": "Integration lane with upstream Digital Core + EDB stubs.",
+      "baseUrl": "https://sit.api.pic.takeda.com"
+    },
+    {
+      "key": "DEV",
+      "label": "Development",
+      "description": "Sandbox used by engineers for feature spikes and pairing.",
+      "baseUrl": "https://dev.api.pic.takeda.com"
+    }
+  ],
+  "apiPrimaryDeveloper": {
+    "name": "Ava Raman",
+    "email": "ava.raman@takeda.com"
+  },
+  "pathParameters": [],
+  "queryParameters": [
+    { "name": "role", "type": "string", "description": "Filter by normalized PIC role slug.", "example": "quality_lead" },
+    { "name": "siteCode", "type": "string", "description": "Restrict to a specific manufacturing site code.", "example": "OESSM-01" },
+    { "name": "includeInactive", "type": "boolean", "description": "Include soft-deactivated records.", "example": true },
+    { "name": "fields", "type": "string", "description": "Comma-separated projection (e.g., id,name,email,roles).", "example": "id,name,email" },
+    { "name": "sort", "type": "string", "description": "Sort definition (field:direction).", "example": "lastActive:desc" },
+    { "name": "page", "type": "integer", "description": "Offset pagination page number (1-indexed).", "example": 2 },
+    { "name": "pageSize", "type": "integer", "description": "Number of records per page (1-200).", "example": 50 },
+    { "name": "nextPageToken", "type": "string", "description": "Cursor token returned from previous response.", "example": "eyJjdHMiOjE3MzI0Nzg5MDB9" },
+    { "name": "search", "type": "string", "description": "Free text search term based on configured search options.", "example": "Ortiz" }
+  ],
+  "filters": [
+    {
+      "name": "Role",
+      "field": "roles",
+      "multiSelect": true,
+      "type": "string",
+      "description": "Matches any of the supplied roles.",
+      "example": ["quality_lead", "digital_pm"]
+    },
+    {
+      "name": "Site",
+      "field": "site.code",
+      "multiSelect": true,
+      "type": "string",
+      "description": "Filter by manufacturing site code(s).",
+      "example": ["OESSM-01", "SM-03"]
+    },
+    {
+      "name": "Availability",
+      "field": "availability.band",
+      "multiSelect": false,
+      "type": "enum",
+      "description": "Single-select flag describing staffing availability (green / amber / red).",
+      "example": "green"
+    }
+  ],
+  "sortOptions": [
+    {
+      "field": "name",
+      "description": "Alphabetical by full name.",
+      "defaultDirection": "asc",
+      "allowedDirections": ["asc", "desc"]
+    },
+    {
+      "field": "lastActive",
+      "description": "Recent platform activity timestamp.",
+      "defaultDirection": "desc",
+      "allowedDirections": ["asc", "desc"]
+    },
+    {
+      "field": "createdAt",
+      "description": "Account creation date.",
+      "defaultDirection": "desc",
+      "allowedDirections": ["desc"]
+    }
+  ],
+  "paginationOptions": [
+    {
+      "parameter": "page",
+      "type": "integer",
+      "description": "1-indexed page used for offset pagination.",
+      "example": 3
+    },
+    {
+      "parameter": "pageSize",
+      "type": "integer",
+      "description": "Items per page (default 50, max 200).",
+      "example": 100
+    },
+    {
+      "parameter": "nextPageToken",
+      "type": "string",
+      "description": "Opaque cursor for resumable sync.",
+      "example": "eyJjdHMiOjE3MzI0Nzg5MDB9"
+    }
+  ],
+  "paginationNotes": "Offset pagination (page/pageSize) for deterministic admin views. Cursor token preferred for bulk sync loops.",
+  "searchOptions": [
+    {
+      "field": "name",
+      "matchType": "contains",
+      "description": "Case-insensitive match across given and family name."
+    },
+    {
+      "field": "email",
+      "matchType": "startsWith",
+      "description": "Matches the username portion of Takeda email addresses."
+    },
+    {
+      "field": "skills",
+      "matchType": "exact",
+      "description": "Exact tag match for enablement skills."
+    }
+  ],
+  "responseBody": {
+    "data": [
+      {
+        "id": "usr_913",
+        "name": "Lena Ortiz",
+        "email": "lena.ortiz@takeda.com",
+        "roles": ["quality_lead", "edb_admin"],
+        "site": {
+          "code": "OESSM-01",
+          "name": "Lexington Fill-Finish",
+          "region": "NA",
+          "timezone": "America/New_York"
+        },
+        "status": "active",
+        "availability": { "band": "green", "updatedAt": "2025-11-13T12:02:00Z" },
+        "lastActive": "2025-11-13T14:21:00Z",
+        "skills": ["serialization", "advanced_analytics"]
+      }
+    ],
+    "page": {
+      "current": 2,
+      "pageSize": 50,
+      "totalItems": 642,
+      "totalPages": 13,
+      "nextPageToken": "eyJjdHMiOjE3MzI0Nzg5MDB9"
+    },
+    "links": {
+      "self": "/users?page=2",
+      "next": "/users?page=3",
+      "export": "/users/export?job=SIM-8831"
+    }
+  },
+  "responseStructure": {
+    "data": [
+      {
+        "id": "string",
+        "name": "string",
+        "email": "string",
+        "roles": ["string"],
+        "site": {
+          "code": "string",
+          "name": "string",
+          "region": "string",
+          "timezone": "string"
+        },
+        "status": "active | inactive | pending | contract",
+        "availability": {
+          "band": "green | amber | red",
+          "updatedAt": "ISO-8601 string"
+        },
+        "lastActive": "ISO-8601 string",
+        "skills": ["string"]
+      }
+    ],
+    "page": {
+      "current": "integer",
+      "pageSize": "integer",
+      "totalItems": "integer",
+      "totalPages": "integer",
+      "nextPageToken": "string|null"
+    },
+    "links": {
+      "self": "string",
+      "next": "string|null",
+      "export": "string"
+    }
+  },
+  "statusCodes": [
+    { "code": 200, "meaning": "Request succeeded.", "remediation": "N/A" },
+    { "code": 400, "meaning": "Invalid filter or pagination argument.", "remediation": "Inspect error.detail for offending field." },
+    { "code": 401, "meaning": "Missing or expired bearer token.", "remediation": "Obtain a fresh OAuth token." },
+    { "code": 404, "meaning": "No users match the supplied filters.", "remediation": "Relax filters or verify identifiers." },
+    { "code": 429, "meaning": "Rate limit exceeded (200 req/min).", "remediation": "Honor Retry-After header." },
+    { "code": 500, "meaning": "Unexpected server error.", "remediation": "Retry with backoff; contact on-call if persistent." }
+  ],
+  "specialNotes": [
+    "ETag + If-None-Match supported for cache validation.",
+    "Results exclude contractors unless includeInactive=true AND filter role=contractor.",
+    "Export link expires after 10 minutes; clients must download immediately."
+  ]
+}

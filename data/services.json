@@ -1,0 +1,36 @@
+{
+  "services": [
+    {
+      "id": "users-directory",
+      "name": "PIC Users Directory",
+      "url": "https://api.pic.takeda.com/users",
+      "description": "Central roster service exposing PIC users, roles, skills, and staffing metadata used by dashboards and agents.",
+      "type": "REST",
+      "status": "stable",
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/users",
+          "summary": "Paginated roster with filters, search, and cursor pagination.",
+          "page": "api/users.html"
+        }
+      ]
+    },
+    {
+      "id": "digital-thread-graph",
+      "name": "Digital Thread Graph",
+      "url": "https://graph.pic.takeda.com/graphql",
+      "description": "GraphQL gateway unifying products, deviations, KPIs, and recommendation flows for decision intelligence.",
+      "type": "GRAPHQL",
+      "status": "beta",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/graphql",
+          "summary": "Single endpoint for queries, mutations, and subscriptions.",
+          "page": null
+        }
+      ]
+    }
+  ]
+}

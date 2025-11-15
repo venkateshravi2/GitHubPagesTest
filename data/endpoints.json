@@ -1,0 +1,14 @@
+{
+  "endpoints": [
+    {
+      "id": "users",
+      "name": "Users Directory",
+      "method": "GET",
+      "path": "/users",
+      "summary": "Paginated roster of PIC users with roles, site alignment, and staffing metadata.",
+      "version": "v1.2",
+      "auth": "PIC OAuth",
+      "page": "api/users.html"
+    }
+  ]
+}

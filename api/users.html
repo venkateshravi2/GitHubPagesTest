@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Directory API · PIC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">PIC Docs</div>
+        <div class="nav-links">
+            <a href="../index.html">Overview</a>
+            <a href="../services.html">Services</a>
+        </div>
+    </nav>
+    <div class="site-shell">
+        <header class="hero">
+            <div class="hero-content">
+                <span class="badge" id="serviceBadge">Loading service…</span>
+                <h1 id="serviceNameHeading">Loading service…</h1>
+                <div class="hero-endpoint" id="endpointTitle">Loading endpoint…</div>
+                <p id="endpointSummary"></p>
+                <div class="env-panel">
+                    <div class="select-stack">
+                        <label for="environmentSelect" style="font-size:0.9rem;color:var(--pic-muted);">Environment</label>
+                        <select id="environmentSelect" class="env-select"></select>
+                        <div class="env-description" id="envDescription"></div>
+                    </div>
+                    <div class="select-stack">
+                        <label style="font-size:0.9rem;color:var(--pic-muted);">Base URL</label>
+                        <span class="base-url-pill" id="baseUrlDisplay">—</span>
+                    </div>
+                </div>
+                <div class="warning-banner" id="envWarning" hidden>
+                    This documentation is only relevant for the feature as is in production, it might not state the current nature of the API in other environments.
+                </div>
+            </div>
+        </header>
+        <main id="endpointMain" hidden>
+            <section class="section">
+                <div class="section-kicker">Endpoint</div>
+                <h2>Contract overview</h2>
+                <div class="endpoint-highlight" id="endpointHighlight">
+                    <div class="endpoint-method" id="endpointMethod">—</div>
+                    <div>
+                        <div class="endpoint-path" id="endpointPath">—</div>
+                        <p id="endpointDescription"></p>
+                        <div class="endpoint-meta" id="endpointMeta"></div>
+                    </div>
+                </div>
+                <div class="metadata-grid" id="metadataGrid"></div>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Path parameters</div>
+                <h2>Route variables</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pathParamsBody"></tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Query parameters</div>
+                <h2>Filters & controls</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queryParamsBody"></tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Filters</div>
+                <h2>Declarative filters</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Field</th>
+                            <th>Select mode</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody id="filtersBody"></tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Sorting</div>
+                <h2>Sort options</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Description</th>
+                            <th>Default direction</th>
+                            <th>Allowed directions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sortBody"></tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Pagination</div>
+                <h2>Pagination options</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paginationBody"></tbody>
+                </table>
+                <p class="env-description" id="paginationNote"></p>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Search</div>
+                <h2>Search options</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Match type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchBody"></tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Response body</div>
+                <h2>Sample payload</h2>
+                <div class="code-block"><code id="responseBodyBlock">{}</code></div>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Response structure</div>
+                <h2>Shape definition</h2>
+                <div class="code-block"><code id="responseStructureBlock">{}</code></div>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Status codes</div>
+                <h2>Error handling</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Meaning</th>
+                            <th>Remediation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statusCodesBody"></tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <div class="section-kicker">Notes</div>
+                <h2>Special considerations</h2>
+                <ul id="specialNotesList"></ul>
+            </section>
+        </main>
+        <footer>Built with care by the Predictive Insights Center · Takeda GMS/GQ</footer>
+    </div>
+    <script>
+        const DATA_URL = '../data/users.json';
+        const selectEl = document.getElementById('environmentSelect');
+        const envDescEl = document.getElementById('envDescription');
+        const baseUrlEl = document.getElementById('baseUrlDisplay');
+        const warningEl = document.getElementById('envWarning');
+        const endpointMain = document.getElementById('endpointMain');
+        const serviceNameHeading = document.getElementById('serviceNameHeading');
+        const endpointTitleEl = document.getElementById('endpointTitle');
+
+        const setEmptyState = (tbody, message, colSpan) => {
+            tbody.innerHTML = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = colSpan;
+            cell.innerHTML = `<span class="empty-state">${message}</span>`;
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        };
+
+        const renderTable = (tbody, rows, colSpan, mapper) => {
+            tbody.innerHTML = '';
+            if (!rows || !rows.length) {
+                setEmptyState(tbody, 'None defined.', colSpan);
+                return;
+            }
+            rows.forEach(rowData => {
+                const row = document.createElement('tr');
+                mapper(row, rowData);
+                tbody.appendChild(row);
+            });
+        };
+
+        const formatJSON = obj => JSON.stringify(obj, null, 2);
+
+        fetch(DATA_URL)
+            .then(res => {
+                if (!res.ok) throw new Error('Unable to load endpoint configuration.');
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('serviceBadge').textContent = data.serviceName;
+                serviceNameHeading.textContent = data.serviceName;
+                endpointTitleEl.textContent = `${data.endpoint.method} ${data.endpoint.path}`;
+                document.getElementById('endpointSummary').textContent = data.endpoint.summary;
+
+                document.getElementById('endpointMethod').textContent = data.endpoint.method;
+                document.getElementById('endpointPath').textContent = data.endpoint.path;
+                document.getElementById('endpointDescription').textContent = data.endpoint.summary;
+
+                const meta = document.getElementById('endpointMeta');
+                meta.innerHTML = `
+                    <span class="pill">Version ${data.endpoint.version}</span>
+                    <span class="pill">${data.endpoint.auth}</span>
+                    <span class="pill">Cache ${data.endpoint.cache}</span>
+                `;
+
+                const metadataGrid = document.getElementById('metadataGrid');
+                metadataGrid.innerHTML = `
+                    <div class="metadata-card">
+                        <h4>URL prefix</h4>
+                        <code class="endpoint-path">${data.urlPrefix}</code>
+                    </div>
+                    <div class="metadata-card">
+                        <h4>Primary developer</h4>
+                        <p>${data.apiPrimaryDeveloper.name}<br><a href="mailto:${data.apiPrimaryDeveloper.email}">${data.apiPrimaryDeveloper.email}</a></p>
+                    </div>
+                `;
+
+                renderTable(document.getElementById('pathParamsBody'), data.pathParameters, 4, (row, item) => {
+                    row.innerHTML = `
+                        <td><code>${item.name}</code></td>
+                        <td>${item.type}</td>
+                        <td>${item.description}</td>
+                        <td>${item.example ?? '—'}</td>
+                    `;
+                });
+
+                renderTable(document.getElementById('queryParamsBody'), data.queryParameters, 4, (row, item) => {
+                    row.innerHTML = `
+                        <td><code>${item.name}</code></td>
+                        <td>${item.type}</td>
+                        <td>${item.description}</td>
+                        <td>${item.example ?? '—'}</td>
+                    `;
+                });
+
+                renderTable(document.getElementById('filtersBody'), data.filters, 6, (row, item) => {
+                    const selectMode = item.multiSelect ? 'Multi-select' : 'Single-select';
+                    const example = Array.isArray(item.example) ? item.example.join(', ') : (item.example ?? '—');
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td><code>${item.field}</code></td>
+                        <td>${selectMode}</td>
+                        <td>${item.type}</td>
+                        <td>${item.description}</td>
+                        <td>${example}</td>
+                    `;
+                });
+
+                renderTable(document.getElementById('sortBody'), data.sortOptions, 4, (row, item) => {
+                    row.innerHTML = `
+                        <td><code>${item.field}</code></td>
+                        <td>${item.description}</td>
+                        <td>${item.defaultDirection}</td>
+                        <td>${(item.allowedDirections || []).join(', ')}</td>
+                    `;
+                });
+
+                renderTable(document.getElementById('paginationBody'), data.paginationOptions, 4, (row, item) => {
+                    row.innerHTML = `
+                        <td><code>${item.parameter}</code></td>
+                        <td>${item.type}</td>
+                        <td>${item.description}</td>
+                        <td>${item.example ?? '—'}</td>
+                    `;
+                });
+                document.getElementById('paginationNote').textContent = data.paginationNotes || '';
+
+                renderTable(document.getElementById('searchBody'), data.searchOptions, 3, (row, item) => {
+                    row.innerHTML = `
+                        <td><code>${item.field}</code></td>
+                        <td>${item.matchType}</td>
+                        <td>${item.description}</td>
+                    `;
+                });
+
+                document.getElementById('responseBodyBlock').textContent = formatJSON(data.responseBody);
+                document.getElementById('responseStructureBlock').textContent = formatJSON(data.responseStructure);
+
+                renderTable(document.getElementById('statusCodesBody'), data.statusCodes, 3, (row, item) => {
+                    const statusClass = item.code >= 400 ? 'status-chip status-warn' : 'status-chip status-ok';
+                    row.innerHTML = `
+                        <td><span class="${statusClass}">${item.code}</span></td>
+                        <td>${item.meaning}</td>
+                        <td>${item.remediation}</td>
+                    `;
+                });
+
+                const notesList = document.getElementById('specialNotesList');
+                notesList.innerHTML = '';
+                if (!data.specialNotes || !data.specialNotes.length) {
+                    const li = document.createElement('li');
+                    li.className = 'empty-state';
+                    li.textContent = 'No special notes.';
+                    notesList.appendChild(li);
+                } else {
+                    data.specialNotes.forEach(note => {
+                        const li = document.createElement('li');
+                        li.textContent = note;
+                        notesList.appendChild(li);
+                    });
+                }
+
+                // Environment select
+                data.environments.forEach(env => {
+                    const option = document.createElement('option');
+                    option.value = env.key;
+                    option.textContent = `${env.key} · ${env.label}`;
+                    option.dataset.description = env.label + ': ' + env.description;
+                    option.dataset.baseUrl = env.baseUrl;
+                    selectEl.appendChild(option);
+                });
+
+                const updateEnvironment = () => {
+                    const selected = selectEl.options[selectEl.selectedIndex];
+                    if (!selected) return;
+                    envDescEl.textContent = selected.dataset.description;
+                    const base = selected.dataset.baseUrl.replace(/\/$/, '');
+                    const prefix = data.urlPrefix.startsWith('/') ? data.urlPrefix : `/${data.urlPrefix}`;
+                    baseUrlEl.textContent = `${base}${prefix}`;
+                    warningEl.hidden = selected.value === 'PROD';
+                };
+
+                selectEl.addEventListener('change', updateEnvironment);
+                selectEl.selectedIndex = 0;
+                updateEnvironment();
+
+                endpointMain.hidden = false;
+            })
+            .catch(err => {
+                document.getElementById('endpointSummary').textContent = err.message;
+            });
+    </script>
+</body>
+</html>

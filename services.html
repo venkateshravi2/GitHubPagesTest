@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIC Services Catalog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">PIC Docs</div>
+        <div class="nav-links">
+            <a href="index.html">Overview</a>
+            <a href="services.html" aria-current="page">Services</a>
+        </div>
+    </nav>
+    <div class="site-shell">
+        <header class="hero hero--compact">
+            <div class="hero-content">
+                <span class="badge">Service Directory</span>
+                <h1>PIC Platform Services</h1>
+                <p>Explore every public-facing service powering the Predictive Insights Center. Filter by protocol, inspect metadata, and jump directly into endpoint documentation.</p>
+            </div>
+        </header>
+        <main>
+            <section class="section">
+                <div class="section-kicker">Catalog</div>
+                <div class="services-toolbar">
+                    <div>
+                        <h2>All Services</h2>
+                        <p class="toolbar-subcopy">Click a REST endpoint badge to open its dedicated reference. GraphQL entries link to their playgrounds.</p>
+                    </div>
+                    <div class="chip-group" id="typeFilters">
+                        <button data-type="ALL" class="chip chip--active">All</button>
+                        <button data-type="REST" class="chip">REST</button>
+                        <button data-type="GRAPHQL" class="chip">GraphQL</button>
+                    </div>
+                </div>
+                <div class="services-grid" id="servicesGrid"></div>
+                <div id="servicesFallback" class="empty-state" style="margin-top:16px;"></div>
+            </section>
+            <section class="section">
+                <div class="section-kicker">Topology</div>
+                <h2>Service → Endpoint Map</h2>
+                <p class="toolbar-subcopy">Generated from the same JSON powering the cards, so the diagram always matches the catalog.</p>
+                <div class="mermaid-panel">
+                    <div id="servicesMermaid" class="mermaid-container">Loading visual...</div>
+                </div>
+            </section>
+        </main>
+        <footer>Built with care by the Predictive Insights Center · Takeda GMS/GQ</footer>
+    </div>
+    <script>
+        const grid = document.getElementById('servicesGrid');
+        const fallback = document.getElementById('servicesFallback');
+        const chipGroup = document.getElementById('typeFilters');
+        const mermaidContainer = document.getElementById('servicesMermaid');
+        let services = [];
+        let currentFilter = 'ALL';
+
+        const badgeForType = (type) => {
+            const tone = type === 'GRAPHQL' ? 'accent' : 'primary';
+            return `<span class="chip chip--${tone}">${type}</span>`;
+        };
+
+        const renderCards = () => {
+            grid.innerHTML = '';
+            const filtered = services.filter(service => currentFilter === 'ALL' || service.type === currentFilter);
+            if (!filtered.length) {
+                fallback.textContent = 'No services match this filter.';
+                return;
+            }
+            fallback.textContent = '';
+            filtered.forEach(service => {
+                const card = document.createElement('article');
+                card.className = 'service-card';
+                const endpoints = (service.endpoints || []).map(endpoint => {
+                    const isRest = service.type === 'REST' && endpoint.page;
+                    const target = isRest ? endpoint.page : service.url;
+                    const label = `${endpoint.method} ${endpoint.path}`;
+                    const buttonClass = isRest ? 'btn btn--primary' : 'btn btn--ghost';
+                    const rel = isRest ? '' : 'rel="noopener" target="_blank"';
+                    return `
+                        <div class="endpoint-row">
+                            <div>
+                                <div class="endpoint-label">${label}</div>
+                                <p>${endpoint.summary}</p>
+                            </div>
+                            <a href="${target}" ${rel} class="${buttonClass}">
+                                ${isRest ? 'View docs' : 'Open console'}
+                            </a>
+                        </div>
+                    `;
+                }).join('');
+                card.innerHTML = `
+                    <div class="service-card__header">
+                        <div>
+                            <h3>${service.name}</h3>
+                            <p>${service.description}</p>
+                        </div>
+                        <div class="service-card__badges">
+                            ${badgeForType(service.type)}
+                            <span class="chip chip--soft">${service.status}</span>
+                        </div>
+                    </div>
+                    <div class="service-meta">
+                        <div>
+                            <span class="meta-label">Service URL</span>
+                            <code>${service.url}</code>
+                        </div>
+                        <div>
+                            <span class="meta-label">Endpoints</span>
+                            <span>${service.endpoints?.length || 0}</span>
+                        </div>
+                    </div>
+                    <div class="service-card__body">
+                        ${endpoints || '<p class="empty-state">No public endpoints.</p>'}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        chipGroup.addEventListener('click', (event) => {
+            if (!event.target.matches('.chip')) return;
+            currentFilter = event.target.dataset.type;
+            chipGroup.querySelectorAll('.chip').forEach(chip => chip.classList.remove('chip--active'));
+            event.target.classList.add('chip--active');
+            renderCards();
+        });
+
+        const sanitize = (text = '') => text.replace(/"/g, '\'');
+
+        const renderMermaidChart = async () => {
+            if (!window.mermaid) {
+                mermaidContainer.textContent = 'Mermaid library not available.';
+                return;
+            }
+            if (!services.length) {
+                mermaidContainer.textContent = 'No data available for chart.';
+                return;
+            }
+            const lines = ['flowchart LR'];
+            services.forEach((service, sIndex) => {
+                const serviceId = `S${sIndex}`;
+                const label = `${sanitize(service.name)}\\n${service.type}`;
+                lines.push(`${serviceId}["${label}"]:::serviceNode`);
+                (service.endpoints || []).forEach((endpoint, eIndex) => {
+                    const endpointId = `${serviceId}E${eIndex}`;
+                    const epLabel = `${endpoint.method} ${endpoint.path}`;
+                    lines.push(`${endpointId}["${sanitize(epLabel)}"]:::endpointNode`);
+                    lines.push(`${serviceId} --> ${endpointId}`);
+                });
+                if (!service.endpoints || !service.endpoints.length) {
+                    const placeholderId = `${serviceId}X`;
+                    lines.push(`${placeholderId}((No endpoints)):::placeholderNode`);
+                    lines.push(`${serviceId} --> ${placeholderId}`);
+                }
+            });
+
+            lines.push('classDef serviceNode fill:#FFEDED,stroke:#E1242A,stroke-width:1px,color:#242424;');
+            lines.push('classDef endpointNode fill:#EEF5FF,stroke:#257CFF,stroke-width:1px,color:#242424;');
+            lines.push('classDef placeholderNode fill:#E2E5EB,stroke:#A1A4AC,color:#454343;');
+
+            const definition = lines.join('\n');
+            try {
+                mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+                const { svg, bindFunctions } = await mermaid.render('servicesGraph', definition);
+                mermaidContainer.innerHTML = svg;
+                if (typeof bindFunctions === 'function') {
+                    bindFunctions(mermaidContainer);
+                }
+            } catch (error) {
+                mermaidContainer.textContent = `Unable to render diagram: ${error.message}`;
+            }
+        };
+
+        fetch('data/services.json')
+            .then(res => {
+                if (!res.ok) throw new Error('Unable to load services catalog.');
+                return res.json();
+            })
+            .then(payload => {
+                services = payload.services || [];
+                renderCards();
+                renderMermaidChart();
+            })
+            .catch(err => {
+                fallback.textContent = err.message;
+                mermaidContainer.textContent = err.message;
+            });
+    </script>
+</body>
+</html>
